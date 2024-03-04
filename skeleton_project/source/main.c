@@ -5,10 +5,7 @@
 #include <stdbool.h>
 #include "driver/elevio.h"
 #include "heis.h"
-/*
 
-
-*/
 int main(){
     elevio_init();
   
@@ -25,16 +22,32 @@ int main(){
         elevio_motorDirection(DIRN_UP);
 
     }
-    
+    printf("Elevator has entered defined state");
 
     elevio_motorDirection(DIRN_STOP);
+    setDirection(STAND_STILL);
 
     while(1){
         int floor = elevio_floorSensor();
         //printf(" The floor is %d\n", floor);
-        
-
-
+        checkForStop();
+        updateHighCommandLists();
+        updateTopDestination();
+        updateBottomDestination();
+        printf("Top Destination:  %d\n", getTopDestination() );
+        printf("Bottom Destination:  %d\n", getBottomDestination() );
+        printDirection();
+        updateLights();
+        checkForStop();
+        decideDirection();
+        checkForStop();
+        if (getDirection() == GOING_UP)
+        {
+            elevio_motorDirection(DIRN_UP);
+        }else if (getDirection() == GOING_DOWN)
+        {
+            elevio_motorDirection(DIRN_DOWN);
+        }
         /*
         for(int f = 0; f < N_FLOORS; f++){
             for(int b = 0; b < N_BUTTONS; b++){
@@ -64,11 +77,16 @@ int main(){
         //elevio_buttonLamp(int floor, ButtonType button, int value);
         }
         */
-        updateHighCommandLists();
+
+
+        
+
+
+        checkForStop();
         updateTopDestination();
         updateBottomDestination();
-        updateLights();
-        nanosleep(&(struct timespec){0, 20*1000*1000}, NULL); // det originale
+        
+        //nanosleep(&(struct timespec){0, 20*1000*1000}, NULL); // det originale
         //nanosleep(&(struct timespec){0, 20*1000*1}, NULL); //litt raskere
         //nanosleep(1);
     }

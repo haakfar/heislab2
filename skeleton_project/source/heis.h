@@ -8,9 +8,12 @@ typedef enum {
 
 void setDirection(direction currentDirection);
 direction getDirection();
+void printDirection();
 
 void updateTopDestination();
 void updateBottomDestination();
+int getTopDestination();
+int getBottomDestination();
 
 void setDownList(int etasje, int status); //setter status på gitt etasje
 void setUpList(int etasje, int status);

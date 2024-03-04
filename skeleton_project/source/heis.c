@@ -1,5 +1,7 @@
 #include "heis.h"
 #include "driver/elevio.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 
 
@@ -19,7 +21,14 @@ void floorFinished(int floor){
    setCabList(floor, 0);
 };
 
-
+int getTopDestination()
+{
+    return currentTopDestination;
+}
+int getBottomDestination()
+{
+    return currentBottomDestination;
+}
 
 void updateTopDestination(){
    int Top = 0;
@@ -57,7 +66,8 @@ void decideDirection()
 {
     updateTopDestination();
     updateBottomDestination();
-
+    int currentFloor = elevio_floorSensor();
+    if (currentFloor != -1){
     if (getDirection() == STAND_STILL)
     {
         if (currentTopDestination > elevio_floorSensor())
@@ -79,28 +89,56 @@ void decideDirection()
             setDirection(GOING_UP);
         }
     }
+    }
 };
 
 
 
 void checkForStop(){
+    
     int floor = elevio_floorSensor();
+    if (floor != -1){
       if ((cabList[floor] || (upList[floor] & (getDirection() == GOING_UP)) || (downList[floor] & (getDirection() == GOING_DOWN))) == 1)
       {
         pitStop();
       }
-   
+    }
 };
+
+
 
 void pitStop()
 {
     elevio_motorDirection(DIRN_STOP);
-};
+    setDirection(STAND_STILL);
+    elevio_doorOpenLamp(1);
+    floorFinished(elevio_floorSensor());
+    for (int i = 0; i<50;i++)
+    {
+        nanosleep(&(struct timespec){0,20*1000*100});
+        updateHighCommandLists();
+        updateLights();
 
+    }
+    
+    floorFinished(elevio_floorSensor());
+    //nanosleep(&(struct timespec){3, 0}, NULL);
+    
+
+    while ((elevio_stopButton() == 1) || (elevio_obstruction() == 1))
+    {
+        nanosleep(&(struct timespec){3, 0}, NULL);
+    };
+    elevio_doorOpenLamp(0);
+
+    
+    decideDirection();
+};
 
 void setDirection(direction direction)
 {
-    currentDirection = direction;
+    currentDirection = direction;                                    
+
 }
 
 direction getDirection()
@@ -110,15 +148,21 @@ direction getDirection()
 
 void setUpList(int etasje, int status)
 {
+    if (etasje != -1){
    upList[etasje] = status;
+    }
 };
 void setDownList(int etasje, int status) //setter status på gitt etasje
 {
+    if (etasje != -1){
   downList[etasje] = status;
+    }
 };
 void setCabList(int etasje, int status)
 {
+    if (etasje != -1){
    cabList[etasje] = status;
+    }
 };
 
 int getUpList(int etasje)
@@ -174,6 +218,23 @@ void printCurrentTopAndBottomDestinations()
 };
 
 
+
+
+void printDirection(){
+
+    if (getDirection()==STAND_STILL)
+    {
+        printf("Direction Stand Still\n");
+    }else if (getDirection()==GOING_UP)
+    {
+        printf("Direction Going Up\n");
+    }else if(getDirection()==GOING_DOWN){
+        printf("Direction Going Down\n");
+    }else{
+        printf("Direction undefined\n");
+    }
+};
+
 void updateLights(){
 
    for (int i = 0; i < N_FLOORS ; i++)
@@ -184,5 +245,9 @@ void updateLights(){
       
       
    }
+           if (elevio_floorSensor()!=-1){
+            elevio_floorIndicator(elevio_floorSensor());
+
+        }
 };
 
