@@ -223,29 +223,37 @@ void pitStop()
 
 
                    while(elevio_stopButton()){
-            setLastDirection(getDirection());
-            floorFinished(0);
-            floorFinished(1);
-            floorFinished(2);
-            floorFinished(3);
-            //setDirection(STAND_STILL);
-            elevio_motorDirection(DIRN_STOP);
-            elevio_doorOpenLamp(1);
-            elevio_stopLamp(1);
-            nanosleep(&(struct timespec){3, 0}, NULL);
-             elevio_stopLamp(0);
-             elevio_doorOpenLamp(0);
-            while (hasNoFurtherCommands())
-            {
-                updateHighCommandLists();
-            }
-            //setDirection(STAND_STILL);
-            //elevio_motorDirection(DIRN_STOP);
+                        setLastDirection(getDirection());
+                        floorFinished(0);
+                        floorFinished(1);
+                        floorFinished(2);
+                        floorFinished(3);
+                        //setDirection(STAND_STILL);
+                        elevio_motorDirection(DIRN_STOP);
+                        elevio_doorOpenLamp(1);
+                        elevio_stopLamp(1);
 
-            //decideDirectionAfterStop();
-            decideDirection();
-            
-        };
+                        while (elevio_stopButton())
+                        {
+                            nanosleep(&(struct timespec){0.01}, NULL);
+                        }
+                        elevio_stopLamp(0);
+
+                        nanosleep(&(struct timespec){3, 0}, NULL);
+
+
+                        elevio_doorOpenLamp(0);
+                        while (hasNoFurtherCommands())
+                        {
+                            updateHighCommandLists();
+                        }
+                        //setDirection(STAND_STILL);
+                        //elevio_motorDirection(DIRN_STOP);
+
+                        //decideDirectionAfterStop();
+                        decideDirection();
+                        
+                    };
 
 
 

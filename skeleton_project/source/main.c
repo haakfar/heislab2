@@ -31,6 +31,13 @@ int main(){
         
         
         while(elevio_stopButton()){
+            if( elevio_floorSensor() != -1)
+            {
+                elevio_doorOpenLamp(1);
+                nanosleep(&(struct timespec){3, 0}, NULL);
+                elevio_doorOpenLamp(0);
+
+            }
             setLastDirection(getDirection());
             floorFinished(0);
             floorFinished(1);
@@ -40,8 +47,17 @@ int main(){
             elevio_motorDirection(DIRN_STOP);
             
             elevio_stopLamp(1);
+
+            while (elevio_stopButton())
+            {
+                nanosleep(&(struct timespec){0.01}, NULL);
+            }
+              elevio_stopLamp(0);
+
             nanosleep(&(struct timespec){3, 0}, NULL);
-             elevio_stopLamp(0);
+
+
+
             while (hasNoFurtherCommands())
             {
                 updateHighCommandLists();
@@ -58,6 +74,7 @@ int main(){
         int floor = elevio_floorSensor();
         //printf(" The floor is %d\n", floor);
         checkForStop();
+        
         updateHighCommandLists();
         updateTopDestination();
         updateBottomDestination();
