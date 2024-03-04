@@ -35,3 +35,5 @@ void decideDirection();
 
 void pitStop();
 void checkForStop();
+
+int hasNoFurtherCommands();
