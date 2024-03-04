@@ -9,6 +9,10 @@ int upList[4] = {0,0,0,0};
 int downList[4] = {0,0,0,0};
 int cabList[4] = {0,0,0,0};
 
+int lastFloor = 0;
+
+direction lastDirection;
+
 direction currentDirection;
 
 int currentTopDestination;
@@ -19,6 +23,7 @@ void floorFinished(int floor){
    setUpList(floor, 0);
    setDownList(floor, 0);
    setCabList(floor, 0);
+   updateLights();
 };
 
 int getTopDestination()
@@ -61,6 +66,29 @@ void updateBottomDestination(){
     currentBottomDestination = Bottom;
 };
 
+void setLastFloor(int floor)
+{
+    lastFloor = floor;
+}
+
+int getLastFloor()
+{
+    return lastFloor;
+}
+
+void setLastDirection(direction dir)
+{
+    lastDirection = dir;
+}
+
+direction getLastDirection()
+{
+    return lastDirection;
+}
+
+
+direction getLastDirection();
+
 
 void decideDirection()
 {
@@ -68,6 +96,8 @@ void decideDirection()
     updateBottomDestination();
     int currentFloor = elevio_floorSensor();
     if (currentFloor != -1){
+        setLastFloor(currentFloor);
+
         if (getDirection() == STAND_STILL)
             
         {printf("getDirection() == STAND_STILL)\n");
@@ -101,15 +131,59 @@ void decideDirection()
     }
 };
 
+
+void decideDirectionAfterStop()
+
+{
+    updateTopDestination();
+    updateBottomDestination();
+    int currentFloor = lastFloor;
+    if (currentFloor != -1){
+        
+
+        if (lastDirection == STAND_STILL)
+            
+        {printf("getDirection() == STAND_STILL)\n");
+            if (currentTopDestination > lastFloor)
+            {
+                printf("currentTopDestination > elevio_floorSensor(), Going UP\n");
+                setDirection(GOING_UP);
+            }
+            else if (currentBottomDestination < lastFloor)
+            {
+                printf("currentBottomDestination < elevio_floorSensor(), Going DOWN\n");
+                setDirection(GOING_DOWN);
+            }
+        }
+        else if (lastDirection == GOING_UP)
+        {   printf("getDirection() == GOING_UP\n");
+            if(currentTopDestination <= lastFloor)
+            {
+                setDirection(GOING_DOWN);
+                printf("currentTopDestination <= elevio_floorSensor(), Going DOWN\n");
+
+            }
+        }else if (lastDirection == GOING_DOWN){
+            if(currentBottomDestination >= lastFloor)
+            {
+                setDirection(GOING_UP);
+                printf("currentBottomDestination >= elevio_floorSensor(), GOING_UP\n");
+
+            }
+        }
+    }
+};
+
 int hasNoFurtherCommands(){
 
     int totalButtonsPressed = 0;
-    for (int i;i<N_FLOORS-1;i++)
+    for (int i=0;i<N_FLOORS;i++)
     {
         totalButtonsPressed += getUpList(i);
         totalButtonsPressed += getDownList(i);
         totalButtonsPressed += getCabList(i);
-    }
+    } 
+    //printf("TotalButtonsPressed");
     if (totalButtonsPressed == 0){return 1;}
     else {return 0;}
 
@@ -136,10 +210,46 @@ void pitStop()
     floorFinished(elevio_floorSensor());
     while (1) { 
 
+
+
+
+
         for (int i = 0; i < 50; i++) {
             nanosleep(&(struct timespec){0, 20 * 1000 * 100}, NULL); 
             updateHighCommandLists();
             updateLights();
+            
+
+
+
+                   while(elevio_stopButton()){
+            setLastDirection(getDirection());
+            floorFinished(0);
+            floorFinished(1);
+            floorFinished(2);
+            floorFinished(3);
+            //setDirection(STAND_STILL);
+            elevio_motorDirection(DIRN_STOP);
+            elevio_doorOpenLamp(1);
+            elevio_stopLamp(1);
+            nanosleep(&(struct timespec){3, 0}, NULL);
+             elevio_stopLamp(0);
+             elevio_doorOpenLamp(0);
+            while (hasNoFurtherCommands())
+            {
+                updateHighCommandLists();
+            }
+            //setDirection(STAND_STILL);
+            //elevio_motorDirection(DIRN_STOP);
+
+            //decideDirectionAfterStop();
+            decideDirection();
+            
+        };
+
+
+
+
 
             if (elevio_obstruction() == 1) {
                

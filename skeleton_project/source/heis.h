@@ -32,8 +32,15 @@ void floorFinished(int floor);
 void printCurrentTopAndBottomDestinations();
 
 void decideDirection();
+void decideDirectionAfterStop();
 
 void pitStop();
 void checkForStop();
 
 int hasNoFurtherCommands();
+
+void setLastFloor(int floor);
+int getLastFloor();
+
+void setLastDirection(direction dir);
+direction getLastDirection();

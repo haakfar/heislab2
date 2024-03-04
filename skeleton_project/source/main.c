@@ -21,13 +21,40 @@ int main(){
     {
         elevio_motorDirection(DIRN_UP);
 
-    }
+    };
     printf("Elevator has entered defined state");
 
     elevio_motorDirection(DIRN_STOP);
     setDirection(STAND_STILL);
 
     while(1){
+        
+        
+        while(elevio_stopButton()){
+            setLastDirection(getDirection());
+            floorFinished(0);
+            floorFinished(1);
+            floorFinished(2);
+            floorFinished(3);
+            //setDirection(STAND_STILL);
+            elevio_motorDirection(DIRN_STOP);
+            
+            elevio_stopLamp(1);
+            nanosleep(&(struct timespec){3, 0}, NULL);
+             elevio_stopLamp(0);
+            while (hasNoFurtherCommands())
+            {
+                updateHighCommandLists();
+            }
+            //setDirection(STAND_STILL);
+            //elevio_motorDirection(DIRN_STOP);
+
+            //decideDirectionAfterStop();
+            decideDirection();
+            
+        };
+    
+
         int floor = elevio_floorSensor();
         //printf(" The floor is %d\n", floor);
         checkForStop();
@@ -43,7 +70,11 @@ int main(){
         checkForStop();
         if (getDirection() == GOING_UP)
         {
-            elevio_motorDirection(DIRN_UP);
+            elevio_motorDirection(DIRN_UP);if(elevio_obstruction()){
+            elevio_stopLamp(1);
+        } else {
+            elevio_stopLamp(0);
+        }
         }else if (getDirection() == GOING_DOWN)
         {
             elevio_motorDirection(DIRN_DOWN);
@@ -56,14 +87,10 @@ int main(){
             }
         }
         */
-        if(elevio_obstruction()){
-            elevio_stopLamp(1);
-        } else {
-            elevio_stopLamp(0);
-        }
+        
         
         if(elevio_stopButton()){
-            elevio_motorDirection(DIRN_STOP);
+            //elevio_motorDirection(DIRN_STOP);
             printCommandLists();
             printCurrentTopAndBottomDestinations();
             //break;
