@@ -5,9 +5,10 @@
 #include <stdbool.h>
 #include "driver/elevio.h"
 #include "heis.h"
-//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
+/*
+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
 
-
+*/
 int main(){
     elevio_init();
   
@@ -30,7 +31,7 @@ int main(){
 
     while(1){
         int floor = elevio_floorSensor();
-        printf(" The floor is %d\n", floor);
+        //printf(" The floor is %d\n", floor);
         
 
 
@@ -50,9 +51,11 @@ int main(){
         
         if(elevio_stopButton()){
             elevio_motorDirection(DIRN_STOP);
-            break;
+            printCommandLists();
+            printCurrentTopAndBottomDestinations();
+            //break;
         }
-        
+        /*
         for (int i = 0; i< N_FLOORS; i++){
         int buttonCalled = elevio_callButton(i, 2);
         printf("Button number:  %d\n", i );
@@ -60,7 +63,11 @@ int main(){
         
         //elevio_buttonLamp(int floor, ButtonType button, int value);
         }
-        
+        */
+        updateHighCommandLists();
+        updateTopDestination();
+        updateBottomDestination();
+        updateLights();
         nanosleep(&(struct timespec){0, 20*1000*1000}, NULL); // det originale
         //nanosleep(&(struct timespec){0, 20*1000*1}, NULL); //litt raskere
         //nanosleep(1);
