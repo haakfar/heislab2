@@ -44,3 +44,5 @@ int getLastFloor();
 
 void setLastDirection(direction dir);
 direction getLastDirection();
+
+void checkForStopButton();

@@ -214,7 +214,7 @@ void pitStop()
 
 
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 30; i++) {
             nanosleep(&(struct timespec){0, 20 * 1000 * 100}, NULL); 
             updateHighCommandLists();
             updateLights();
@@ -236,6 +236,7 @@ void pitStop()
                         while (elevio_stopButton())
                         {
                             nanosleep(&(struct timespec){0.01}, NULL);
+                            elevio_stopLamp(1);
                         }
                         elevio_stopLamp(0);
 
@@ -256,7 +257,7 @@ void pitStop()
                     };
 
 
-
+            
 
 
             if (elevio_obstruction() == 1) {
@@ -283,6 +284,7 @@ void pitStop()
     //decideDirection();
     if (hasNoFurtherCommands() == 1) 
     {setDirection(STAND_STILL);}
+    
 };
 
 void setDirection(direction direction)
@@ -349,6 +351,13 @@ void updateHighCommandLists()
         }
 
 };
+
+
+void checkForStopButton()
+{
+
+};
+
 
 void printCommandLists()
 {
