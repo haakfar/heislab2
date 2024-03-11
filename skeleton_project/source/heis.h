@@ -28,11 +28,14 @@ void printCommandLists();
 void updateLights();
 
 void floorFinished(int floor);
+void allFloorsFinished();
 
 void printCurrentTopAndBottomDestinations();
 
 void decideDirection();
 void decideDirectionAfterStop();
+
+void executeDirection();
 
 void pitStop();
 void checkForStop();
